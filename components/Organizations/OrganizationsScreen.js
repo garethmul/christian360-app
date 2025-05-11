@@ -36,7 +36,7 @@ const organizations = [
     name: 'Chick-fil-A',
     type: 'Restaurant',
     tagline: 'Food with a purpose',
-    banner: 'https://images.unsplash.com/photo-1606149059549-db8ac4b4114c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8Y2hpY2slMjBmaWwlMjBhfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
+    banner: 'https://images.unsplash.com/photo-1550950158-d0d960dff51b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
     logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/02/Chick-fil-A_Logo.svg/220px-Chick-fil-A_Logo.svg.png',
     followers: '5.1M',
     location: 'Atlanta, GA',
@@ -72,7 +72,7 @@ const organizations = [
     name: 'Hobby Lobby',
     type: 'Retail Company',
     tagline: 'Making creativity and home décor accessible',
-    banner: 'https://images.unsplash.com/photo-1583172037821-08dabf48f44f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aG9iYnl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
+    banner: 'https://images.unsplash.com/photo-1558442074-3c19857bc1dc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Hobby_Lobby_store_logo.png/220px-Hobby_Lobby_store_logo.png',
     followers: '2.2M',
     location: 'Oklahoma City, OK',
@@ -91,6 +91,7 @@ const categories = [
 
 const OrganizationCard = ({ organization, onPress }) => {
   const [isFollowing, setIsFollowing] = useState(false);
+  const [logoError, setLogoError] = useState(false);
 
   return (
     <TouchableOpacity 
@@ -106,15 +107,26 @@ const OrganizationCard = ({ organization, onPress }) => {
       />
       
       {/* Logo and basic info */}
-      <View className="px-4 pt-0 pb-4">
-        <View className="flex-row items-end mt-[-40]">
+      <View className="px-4 pt-5 pb-4">
+        <View className="flex-row items-start mt-[-55]">
+          {/* Logo with fallback */}
+          {logoError ? (
+            <View className="w-20 h-20 rounded-lg border-2 border-white bg-indigo-100 items-center justify-center">
+              <Text className="font-bold text-indigo-500 text-lg">
+                {organization.name.charAt(0)}
+              </Text>
+            </View>
+          ) : (
           <Image 
             source={{ uri: organization.logo }} 
             className="w-20 h-20 rounded-lg border-2 border-white bg-white"
             resizeMode="contain"
+              onError={() => setLogoError(true)}
           />
-          <View className="flex-1 ml-3 mb-1">
-            <Text className="text-lg font-bold mt-2">{organization.name}</Text>
+          )}
+          
+          <View className="flex-1 ml-3 mt-8">
+            <Text className="text-lg font-bold">{organization.name}</Text>
             <Text className="text-gray-600 text-sm">{organization.type}</Text>
           </View>
         </View>

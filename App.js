@@ -22,6 +22,9 @@ import AccommodationScreen from './components/Accommodation/AccommodationScreen'
 import MoreScreen from './components/MoreScreen';
 import OrganizationsScreen from './components/Organizations/OrganizationsScreen';
 import OrganizationDetailScreen from './components/Organizations/OrganizationDetailScreen';
+import GroupListScreen from './components/Groups/GroupListScreen';
+import GroupDetailScreen from './components/Groups/GroupDetailScreen';
+import GroupDiscussionScreen from './components/Groups/GroupDiscussionScreen';
 
 // Import screens for "More" tab
 import GroupsScreen from './components/Groups/GroupsScreen';
@@ -29,6 +32,17 @@ import RecommendedReadingScreen from './components/RecommendedReading/Recommende
 import DigitalProductsScreen from './components/DigitalProducts/DigitalProductsScreen';
 import PartnerOrganizationsScreen from './components/PartnerOrganizations/PartnerOrganizationsScreen';
 import LocationsScreen from './components/Locations/LocationsScreen';
+
+// Add these imports
+import ExchangeScreen from './components/Exchange/ExchangeScreen';
+import ExchangeDetailScreen from './components/Exchange/ExchangeDetailScreen';
+import NeededItemDetailScreen from './components/Exchange/NeededItemDetailScreen';
+import PostNeededItemScreen from './components/Exchange/PostNeededItemScreen';
+
+// Add these imports for Moments
+import MomentViewer from './components/Moments/MomentViewer';
+import MomentArrangeScreen from './components/Moments/MomentArrangeScreen';
+import MomentCreationScreen from './components/Moments/MomentCreationScreen';
 
 // Create navigators
 const Tab = createBottomTabNavigator();
@@ -65,6 +79,30 @@ const HomeStackNavigator = () => (
         headerTintColor: "#fff"
       }}
     />
+    <HomeStack.Screen 
+      name="MomentViewer" 
+      component={MomentViewer} 
+      options={{ 
+        headerShown: false,
+        presentation: 'fullScreenModal'
+      }}
+    />
+    <HomeStack.Screen 
+      name="MomentArrange" 
+      component={MomentArrangeScreen} 
+      options={{ 
+        headerShown: false,
+        presentation: 'modal'
+      }}
+    />
+    <HomeStack.Screen 
+      name="MomentCreation" 
+      component={MomentCreationScreen} 
+      options={{ 
+        headerShown: false,
+        presentation: 'modal'
+      }}
+    />
   </HomeStack.Navigator>
 );
 
@@ -88,6 +126,30 @@ const OrganizationsStackNavigator = () => (
         headerTransparent: true,
         headerTintColor: "#fff"
       }}
+    />
+    <OrganizationsStack.Screen 
+      name="GroupList"
+      component={GroupListScreen}
+      options={({ route }) => ({ 
+        headerTitle: "Groups",
+        headerBackTitleVisible: false,
+      })}
+    />
+    <OrganizationsStack.Screen 
+      name="GroupDetail"
+      component={GroupDetailScreen}
+      options={({ route }) => ({ 
+        headerTitle: route.params?.groupName || "Group Details",
+        headerBackTitleVisible: false,
+      })}
+    />
+    <OrganizationsStack.Screen
+      name="GroupDiscussion"
+      component={GroupDiscussionScreen}
+      options={({ route }) => ({ 
+        headerTitle: route.params?.groupName || "Chat",
+        headerBackTitleVisible: false,
+      })}
     />
   </OrganizationsStack.Navigator>
 );
@@ -195,6 +257,40 @@ const MoreStackNavigator = () => (
   </MoreStack.Navigator>
 );
 
+// Exchange Stack Navigator
+const ExchangeStack = createStackNavigator();
+
+const ExchangeStackNavigator = () => (
+  <ExchangeStack.Navigator>
+    <ExchangeStack.Screen 
+      name="ExchangeHome" 
+      component={ExchangeScreen} 
+      options={{ headerShown: false }}
+    />
+    <ExchangeStack.Screen 
+      name="ExchangeDetail" 
+      component={ExchangeDetailScreen} 
+      options={{ 
+        headerShown: false,
+      }}
+    />
+    <ExchangeStack.Screen 
+      name="NeededItemDetail" 
+      component={NeededItemDetailScreen} 
+      options={{ 
+        headerShown: false,
+      }}
+    />
+    <ExchangeStack.Screen 
+      name="PostNeededItem" 
+      component={PostNeededItemScreen} 
+      options={{ 
+        headerShown: false,
+      }}
+    />
+  </ExchangeStack.Navigator>
+);
+
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -206,10 +302,10 @@ export default function App() {
               tabBarActiveTintColor: '#6366f1',
               tabBarInactiveTintColor: '#9ca3af',
               tabBarStyle: { 
-                paddingBottom: 5, 
-                height: 60,
+                paddingBottom: 0, 
+                height: 55,
                 // Ensures tab bar doesn't overlap with home indicator
-                paddingVertical: 5,
+                paddingVertical: 3,
                 backgroundColor: '#ffffff',
                 borderTopWidth: 1,
                 borderTopColor: '#f3f4f6',
@@ -217,10 +313,15 @@ export default function App() {
                 shadowOpacity: 0.1,
                 shadowRadius: 4
               },
+              tabBarItemStyle: {
+                paddingTop: 0,
+                marginTop: -2,
+              },
               tabBarLabelStyle: {
                 fontSize: 12,
                 fontWeight: '500',
-                paddingBottom: 3
+                paddingBottom: 3,
+                marginTop: -2
               },
               tabBarIcon: ({ focused, color, size }) => {
                 let iconName;
@@ -235,10 +336,10 @@ export default function App() {
                   iconName = focused ? 'calendar' : 'calendar-outline';
                 } else if (route.name === 'Organizations') {
                   iconName = focused ? 'business' : 'business-outline';
-                } else if (route.name === 'Stays') {
-                  iconName = focused ? 'bed' : 'bed-outline';
                 } else if (route.name === 'More') {
                   iconName = focused ? 'menu' : 'menu-outline';
+                } else if (route.name === 'Exchange') {
+                  iconName = focused ? 'swap-horizontal' : 'swap-horizontal-outline';
                 }
 
                 return <Ionicons name={iconName} size={size} color={color} />;
@@ -250,7 +351,7 @@ export default function App() {
             <Tab.Screen name="Jobs" component={JobsStackNavigator} />
             <Tab.Screen name="Events" component={EventsStackNavigator} />
             <Tab.Screen name="Organizations" component={OrganizationsStackNavigator} />
-            <Tab.Screen name="Stays" component={AccommodationScreen} />
+            <Tab.Screen name="Exchange" component={ExchangeStackNavigator} />
             <Tab.Screen name="More" component={MoreStackNavigator} />
           </Tab.Navigator>
           <StatusBar style="auto" />

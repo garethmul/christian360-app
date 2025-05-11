@@ -17,22 +17,19 @@ import { DUMMY_EVENTS } from './EventsScreen';
 const { width } = Dimensions.get('window');
 
 const EventDetailsScreen = ({ route, navigation }) => {
-  const { eventId } = route.params;
-  const event = DUMMY_EVENTS.find(event => event.id === eventId);
+  const eventId = route.params?.eventId;
+  const event = eventId ? DUMMY_EVENTS.find(e => e.id === eventId) : undefined;
   const [bookmarked, setBookmarked] = useState(false);
   const [playingVideo, setPlayingVideo] = useState(false);
   const videoRef = React.useRef(null);
   
   if (!event) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center">
-        <Text>Event not found</Text>
-        <TouchableOpacity 
-          className="mt-4 bg-indigo-600 px-4 py-2 rounded-md"
-          onPress={() => navigation.goBack()}
-        >
-          <Text className="text-white">Go Back</Text>
-        </TouchableOpacity>
+      <SafeAreaView className="flex-1 bg-gray-100">
+        <View className="flex-1 justify-center items-center p-4">
+          <Text className="text-lg text-red-500">Event data not found or event ID missing.</Text>
+          {/* For debugging: <Text>Params: {JSON.stringify(route.params)}</Text> */}
+        </View>
       </SafeAreaView>
     );
   }
@@ -201,10 +198,10 @@ const EventDetailsScreen = ({ route, navigation }) => {
                   source={{ uri: event.videoUrl }}
                   rate={1.0}
                   volume={1.0}
-                  isMuted={false}
+                  muted={false}
                   resizeMode="cover"
                   shouldPlay={true}
-                  useNativeControls
+                  controls
                   style={{ width: '100%', height: 200, borderRadius: 8 }}
                 />
               )}

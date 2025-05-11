@@ -28,7 +28,7 @@ const MoreScreen = () => {
   const navigation = useNavigation();
 
   return (
-    <SafeLayout backgroundColor="#f3f4f6">
+    <SafeLayout backgroundColor="#f3f4f6" edges={['top', 'bottom']}>
       <View className="p-4">
         <View className="bg-indigo-700 rounded-lg p-6 mb-6">
           <Text className="text-2xl font-bold text-white mb-2">Christian360</Text>
