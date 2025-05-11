@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 const JobCard = ({
   id,
   title = 'Worship Pastor',
-  company = 'Grace Community Church',
+  company = 'Gracey Community Church',
   logoUrl = 'https://randomuser.me/api/portraits/lego/1.jpg',
   location = 'Nashville, TN',
   salary = '$45,000 - $60,000',
