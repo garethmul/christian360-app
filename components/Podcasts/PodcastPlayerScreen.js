@@ -9,13 +9,14 @@ import {
   ActivityIndicator,
   Dimensions,
   SafeAreaView,
-  StatusBar,
-  Slider
+  StatusBar
 } from 'react-native';
+import Slider from '@react-native-community/slider';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Audio } from 'expo-av';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { AudioService } from './PodcastCarousel';
 
 const { width } = Dimensions.get('window');
 
@@ -30,10 +31,9 @@ const PodcastPlayerScreen = () => {
   const route = useRoute();
   const { podcast } = route.params || {};
   
-  const [sound, setSound] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
@@ -44,11 +44,14 @@ const PodcastPlayerScreen = () => {
     // Load and play the podcast when the screen mounts
     loadAudio();
     
+    // Subscribe to audio status updates
+    const unsubscribe = AudioService.addListener(state => {
+      setIsPlaying(state.isPlaying && state.playingId === podcast?.id);
+    });
+    
     // Cleanup function to unload the audio when the screen unmounts
     return () => {
-      if (sound) {
-        sound.unloadAsync();
-      }
+      unsubscribe();
     };
   }, []);
   
@@ -57,9 +60,9 @@ const PodcastPlayerScreen = () => {
     let interval;
     if (isPlaying) {
       interval = setInterval(async () => {
-        if (sound) {
+        if (AudioService.currentSound) {
           try {
-            const status = await sound.getStatusAsync();
+            const status = await AudioService.currentSound.getStatusAsync();
             if (status.isLoaded) {
               setPosition(status.positionMillis / 1000);
               setPositionText(formatTime(status.positionMillis / 1000));
@@ -76,7 +79,7 @@ const PodcastPlayerScreen = () => {
         clearInterval(interval);
       }
     };
-  }, [isPlaying, sound]);
+  }, [isPlaying]);
   
   const loadAudio = async () => {
     if (!podcast || !podcast.audioUrl) {
@@ -89,19 +92,42 @@ const PodcastPlayerScreen = () => {
     setError(null);
     
     try {
-      // Unload any existing sound
-      if (sound) {
-        await sound.unloadAsync();
-      }
+      // Stop any current audio (from carousel or another player)
+      await AudioService.stopCurrentSound();
       
-      // Load the new sound
-      const { sound: newSound } = await Audio.Sound.createAsync(
+      // Set up status update listener for this component
+      const onPlaybackStatusUpdate = (status) => {
+        if (status.isLoaded) {
+          setDuration(status.durationMillis / 1000);
+          setDurationText(formatTime(status.durationMillis / 1000));
+          setPosition(status.positionMillis / 1000);
+          setPositionText(formatTime(status.positionMillis / 1000));
+          setIsPlaying(status.isPlaying);
+          
+          if (status.didJustFinish) {
+            setIsPlaying(false);
+          }
+        } else {
+          if (status.error) {
+            console.error(`Encountered a fatal error during playback: ${status.error}`);
+            setError(`Playback Error: ${status.error}`);
+          }
+        }
+      };
+      
+      // Play the podcast using AudioService
+      const { sound } = await Audio.Sound.createAsync(
         { uri: podcast.audioUrl },
         { shouldPlay: true },
         onPlaybackStatusUpdate
       );
       
-      setSound(newSound);
+      // Store the sound in AudioService
+      AudioService.currentSound = sound;
+      AudioService.playingId = podcast.id;
+      AudioService.isPlaying = true;
+      AudioService.notifyListeners();
+      
       setIsPlaying(true);
       setIsLoading(false);
     } catch (error) {
@@ -111,68 +137,54 @@ const PodcastPlayerScreen = () => {
     }
   };
   
-  const onPlaybackStatusUpdate = (status) => {
-    if (status.isLoaded) {
-      setDuration(status.durationMillis / 1000);
-      setDurationText(formatTime(status.durationMillis / 1000));
-      setPosition(status.positionMillis / 1000);
-      setPositionText(formatTime(status.positionMillis / 1000));
-      setIsPlaying(status.isPlaying);
-      
-      if (status.didJustFinish) {
-        setIsPlaying(false);
-      }
-    } else {
-      if (status.error) {
-        console.error(`Encountered a fatal error during playback: ${status.error}`);
-        setError(`Playback Error: ${status.error}`);
-      }
-    }
-  };
-  
   const handlePlayPause = async () => {
-    if (!sound) return;
-    
-    try {
-      if (isPlaying) {
-        await sound.pauseAsync();
-      } else {
-        await sound.playAsync();
-      }
-    } catch (error) {
-      console.error('Error toggling play/pause:', error);
-    }
+    await AudioService.togglePlayPause();
   };
   
   const handleSeek = async (value) => {
-    if (!sound) return;
+    if (!AudioService.currentSound) return;
     
     try {
-      await sound.setPositionAsync(value * 1000);
+      // Check if the sound is loaded before attempting to seek
+      const status = await AudioService.currentSound.getStatusAsync();
+      if (status.isLoaded) {
+        await AudioService.currentSound.setPositionAsync(value * 1000);
+      }
     } catch (error) {
       console.error('Error seeking:', error);
+      // Don't show an error UI for seek failures, just log it
     }
   };
   
   const handleSkipBackward = async () => {
-    if (!sound) return;
+    if (!AudioService.currentSound) return;
     
     try {
-      const newPosition = Math.max(0, position - 15);
-      await sound.setPositionAsync(newPosition * 1000);
+      // Check if the sound is loaded before attempting to seek
+      const status = await AudioService.currentSound.getStatusAsync();
+      if (status.isLoaded) {
+        const newPosition = Math.max(0, position - 15);
+        await AudioService.currentSound.setPositionAsync(newPosition * 1000);
+      }
     } catch (error) {
       console.error('Error skipping backward:', error);
+      // Don't show an error UI for skip failures, just log it
     }
   };
   
   const handleSkipForward = async () => {
-    if (!sound) return;
+    if (!AudioService.currentSound) return;
     
     try {
-      const newPosition = Math.min(duration, position + 30);
-      await sound.setPositionAsync(newPosition * 1000);
+      // Check if the sound is loaded before attempting to seek
+      const status = await AudioService.currentSound.getStatusAsync();
+      if (status.isLoaded) {
+        const newPosition = Math.min(duration, position + 30);
+        await AudioService.currentSound.setPositionAsync(newPosition * 1000);
+      }
     } catch (error) {
       console.error('Error skipping forward:', error);
+      // Don't show an error UI for skip failures, just log it
     }
   };
   
@@ -338,6 +350,8 @@ const styles = StyleSheet.create({
     height: width - 80,
     borderRadius: 12,
     backgroundColor: '#f3f4f6',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
   },
   infoContainer: {
     paddingHorizontal: 24,

@@ -756,15 +756,18 @@ const HomeScreen = () => {
           </View>
 
           {/* Add Podcast Carousels */}
-          <Text className="text-xl font-bold mt-4 mb-2">Christian Podcasts</Text>
-          {podcastFeeds.map(feed => (
-            <PodcastCarousel 
-              key={feed.id}
-              feedUrl={feed.url}
-              title={feed.title}
-              navigateToPlayer={handlePodcastPress}
-            />
-          ))}
+          <View className="mb-6">
+            <Text className="text-xl font-bold mb-2">Christian Podcasts</Text>
+            {podcastFeeds.map((feed, index) => (
+              <PodcastCarousel 
+                key={feed.id}
+                feedUrl={feed.url}
+                title={feed.title}
+                navigateToPlayer={handlePodcastPress}
+                horizontalLayout={index === 0} // First feed uses horizontal layout
+              />
+            ))}
+          </View>
 
           {/* Christian Feed section at the very end */}
           <ChristianFeedSection navigation={navigation} />
