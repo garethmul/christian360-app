@@ -44,6 +44,9 @@ import MomentViewer from './components/Moments/MomentViewer';
 import MomentArrangeScreen from './components/Moments/MomentArrangeScreen';
 import MomentCreationScreen from './components/Moments/MomentCreationScreen';
 
+// Add this import for the new CommunityScreen
+import CommunityScreen from './components/Community/CommunityScreen';
+
 // Create navigators
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
@@ -306,6 +309,19 @@ const ExchangeStackNavigator = () => (
   </ExchangeStack.Navigator>
 );
 
+// Create a Community Stack Navigator
+const CommunityStack = createStackNavigator();
+
+const CommunityStackNavigator = () => (
+  <CommunityStack.Navigator>
+    <CommunityStack.Screen 
+      name="CommunityHome" 
+      component={CommunityScreen} 
+      options={{ headerShown: false }}
+    />
+  </CommunityStack.Navigator>
+);
+
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -349,6 +365,8 @@ export default function App() {
                   iconName = focused ? 'calendar' : 'calendar-outline';
                 } else if (route.name === 'Organizations') {
                   iconName = focused ? 'business' : 'business-outline';
+                } else if (route.name === 'Community') {
+                  iconName = focused ? 'people' : 'people-outline';
                 } else if (route.name === 'More') {
                   iconName = focused ? 'menu' : 'menu-outline';
                 } else if (route.name === 'Exchange') {
@@ -360,6 +378,7 @@ export default function App() {
             })}
           >
             <Tab.Screen name="Home" component={HomeStackNavigator} />
+            <Tab.Screen name="Community" component={CommunityStackNavigator} />
             <Tab.Screen name="Jobs" component={JobsStackNavigator} />
             <Tab.Screen name="Events" component={EventsStackNavigator} />
             <Tab.Screen name="Organizations" component={OrganizationsStackNavigator} />
