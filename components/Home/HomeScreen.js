@@ -7,6 +7,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import SafeLayout from '../ui/SafeLayout';
 import MomentStories from '../Moments/MomentStories';
 import PostCard from '../Posts/PostCard';
+import PodcastCarousel from '../Podcasts/PodcastCarousel';
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN = 8;
@@ -497,6 +498,25 @@ const HomeScreen = () => {
     }
   ];
 
+  // Podcast feed URLs
+  const podcastFeeds = [
+    {
+      id: 'echoes',
+      title: 'Echoes Underground',
+      url: 'https://media.rss.com/echoesunderground/feed.xml'
+    },
+    {
+      id: 'anchor',
+      title: 'Featured Podcasts',
+      url: 'https://anchor.fm/s/d45e8f10/podcast/rss'
+    }
+  ];
+
+  const handlePodcastPress = (podcast) => {
+    // Navigate to the podcast player screen
+    navigation.navigate('PodcastPlayer', { podcast });
+  };
+
   return (
     <SafeLayout backgroundColor="#f9fafb" edges={['top', 'bottom']}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -735,7 +755,18 @@ const HomeScreen = () => {
             ))}
           </View>
 
-          {/* Add the Christian Feed section at the very end */}
+          {/* Add Podcast Carousels */}
+          <Text className="text-xl font-bold mt-4 mb-2">Christian Podcasts</Text>
+          {podcastFeeds.map(feed => (
+            <PodcastCarousel 
+              key={feed.id}
+              feedUrl={feed.url}
+              title={feed.title}
+              navigateToPlayer={handlePodcastPress}
+            />
+          ))}
+
+          {/* Christian Feed section at the very end */}
           <ChristianFeedSection navigation={navigation} />
           
         </View>

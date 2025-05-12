@@ -47,6 +47,9 @@ import MomentCreationScreen from './components/Moments/MomentCreationScreen';
 // Add this import for the new CommunityScreen
 import CommunityScreen from './components/Community/CommunityScreen';
 
+// Add the import for PodcastPlayerScreen
+import PodcastPlayerScreen from './components/Podcasts/PodcastPlayerScreen';
+
 // Create navigators
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
@@ -119,6 +122,14 @@ const HomeStackNavigator = () => (
       component={PostDetailsScreen} 
       options={{ 
         headerShown: false,
+      }}
+    />
+    <HomeStack.Screen 
+      name="PodcastPlayer" 
+      component={PodcastPlayerScreen} 
+      options={{ 
+        headerShown: false,
+        presentation: 'fullScreenModal',
       }}
     />
   </HomeStack.Navigator>
