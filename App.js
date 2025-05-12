@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Import our custom screens
 import HomeScreen from './components/Home/HomeScreen';
@@ -33,25 +34,28 @@ import DigitalProductsScreen from './components/DigitalProducts/DigitalProductsS
 import PartnerOrganizationsScreen from './components/PartnerOrganizations/PartnerOrganizationsScreen';
 import LocationsScreen from './components/Locations/LocationsScreen';
 
-// Add these imports
+// Import Exchange screens
 import ExchangeScreen from './components/Exchange/ExchangeScreen';
 import ExchangeDetailScreen from './components/Exchange/ExchangeDetailScreen';
 import NeededItemDetailScreen from './components/Exchange/NeededItemDetailScreen';
 import PostNeededItemScreen from './components/Exchange/PostNeededItemScreen';
 
-// Add these imports for Moments
+// Import Moments screens
 import MomentViewer from './components/Moments/MomentViewer';
 import MomentArrangeScreen from './components/Moments/MomentArrangeScreen';
 import MomentCreationScreen from './components/Moments/MomentCreationScreen';
 
+// Import new top-level screens
+import CommunityScreen from './components/Community/CommunityScreen';
+import MarketplaceScreen from './components/Marketplace/MarketplaceScreen';
+import LibraryScreen from './components/Library/LibraryScreen';
+
 // Create navigators
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
-const PostsStack = createStackNavigator();
-const JobsStack = createStackNavigator();
-const EventsStack = createStackNavigator();
-const MoreStack = createStackNavigator();
-const OrganizationsStack = createStackNavigator();
+const CommunityStack = createStackNavigator();
+const MarketplaceStack = createStackNavigator();
+const LibraryStack = createStackNavigator();
 
 // Home Stack Navigator
 const HomeStackNavigator = () => (
@@ -103,21 +107,47 @@ const HomeStackNavigator = () => (
         presentation: 'modal'
       }}
     />
+    <HomeStack.Screen
+      name="PostDetails" 
+      component={PostDetailsScreen} 
+      options={{ 
+        headerShown: false,
+      }}
+    />
+    <HomeStack.Screen
+      name="EventDetails" 
+      component={EventDetailsScreen} 
+      options={{ 
+        headerShown: false,
+      }}
+    />
+    <HomeStack.Screen
+      name="JobDetails" 
+      component={JobDetailsScreen} 
+      options={{ 
+        headerShown: false,
+      }}
+    />
   </HomeStack.Navigator>
 );
 
-// Organizations Stack Navigator
-const OrganizationsStackNavigator = () => (
-  <OrganizationsStack.Navigator>
-    <OrganizationsStack.Screen 
-      name="OrganizationsHome" 
-      component={OrganizationsScreen} 
+// Community Stack Navigator
+const CommunityStackNavigator = () => (
+  <CommunityStack.Navigator>
+    <CommunityStack.Screen 
+      name="CommunityHome" 
+      component={CommunityScreen} 
+      options={{ headerShown: false }}
+    />
+    <CommunityStack.Screen
+      name="Organizations"
+      component={OrganizationsScreen}
       options={{ 
         headerTitle: "Organizations",
         headerBackTitleVisible: false
       }}
     />
-    <OrganizationsStack.Screen
+    <CommunityStack.Screen
       name="OrganizationDetail"
       component={OrganizationDetailScreen}
       options={{ 
@@ -127,7 +157,21 @@ const OrganizationsStackNavigator = () => (
         headerTintColor: "#fff"
       }}
     />
-    <OrganizationsStack.Screen 
+    <CommunityStack.Screen
+      name="JobDetails" 
+      component={JobDetailsScreen} 
+      options={{ 
+        headerShown: false,
+      }}
+    />
+    <CommunityStack.Screen
+      name="EventDetails" 
+      component={EventDetailsScreen} 
+      options={{ 
+        headerShown: false,
+      }}
+    />
+    <CommunityStack.Screen 
       name="GroupList"
       component={GroupListScreen}
       options={({ route }) => ({ 
@@ -135,7 +179,7 @@ const OrganizationsStackNavigator = () => (
         headerBackTitleVisible: false,
       })}
     />
-    <OrganizationsStack.Screen 
+    <CommunityStack.Screen 
       name="GroupDetail"
       component={GroupDetailScreen}
       options={({ route }) => ({ 
@@ -143,7 +187,7 @@ const OrganizationsStackNavigator = () => (
         headerBackTitleVisible: false,
       })}
     />
-    <OrganizationsStack.Screen
+    <CommunityStack.Screen
       name="GroupDiscussion"
       component={GroupDiscussionScreen}
       options={({ route }) => ({ 
@@ -151,144 +195,58 @@ const OrganizationsStackNavigator = () => (
         headerBackTitleVisible: false,
       })}
     />
-  </OrganizationsStack.Navigator>
+  </CommunityStack.Navigator>
 );
 
-// Posts Stack Navigator
-const PostsStackNavigator = () => (
-  <PostsStack.Navigator>
-    <PostsStack.Screen 
-      name="PostsFeed" 
-      component={PostsScreen} 
+// Marketplace Stack Navigator
+const MarketplaceStackNavigator = () => (
+  <MarketplaceStack.Navigator>
+    <MarketplaceStack.Screen 
+      name="MarketplaceHome" 
+      component={MarketplaceScreen} 
       options={{ headerShown: false }}
     />
-    <PostsStack.Screen 
-      name="CreatePost" 
-      component={CreatePostScreen} 
-      options={{ 
-        headerShown: false,
-        presentation: 'modal',
-      }}
-    />
-    <PostsStack.Screen 
-      name="PostDetails" 
-      component={PostDetailsScreen} 
-      options={{ 
-        headerShown: false,
-      }}
-    />
-  </PostsStack.Navigator>
-);
-
-// Jobs Stack Navigator
-const JobsStackNavigator = () => (
-  <JobsStack.Navigator>
-    <JobsStack.Screen 
-      name="JobsFeed" 
-      component={JobsScreen} 
-      options={{ headerShown: false }}
-    />
-    <JobsStack.Screen 
-      name="JobDetails" 
-      component={JobDetailsScreen} 
-      options={{ 
-        headerShown: false,
-      }}
-    />
-  </JobsStack.Navigator>
-);
-
-// Events Stack Navigator
-const EventsStackNavigator = () => (
-  <EventsStack.Navigator>
-    <EventsStack.Screen 
-      name="EventsFeed" 
-      component={EventsScreen} 
-      options={{ headerShown: false }}
-    />
-    <EventsStack.Screen 
-      name="EventDetails" 
-      component={EventDetailsScreen} 
-      options={{ 
-        headerShown: false,
-      }}
-    />
-  </EventsStack.Navigator>
-);
-
-// More Stack Navigator
-const MoreStackNavigator = () => (
-  <MoreStack.Navigator>
-    <MoreStack.Screen 
-      name="MoreHome" 
-      component={MoreScreen} 
-      options={{ headerShown: false }}
-    />
-    <MoreStack.Screen
-      name="Organizations"
-      component={OrganizationsScreen}
-      options={{ headerShown: true, title: 'Organizations' }}
-    />
-    <MoreStack.Screen
-      name="Groups"
-      component={GroupsScreen}
-      options={{ headerShown: true, title: 'Groups' }}
-    />
-    <MoreStack.Screen
-      name="RecommendedReading"
-      component={RecommendedReadingScreen}
-      options={{ headerShown: true, title: 'Recommended Reading' }}
-    />
-    <MoreStack.Screen
-      name="DigitalProducts"
-      component={DigitalProductsScreen}
-      options={{ headerShown: true, title: 'Digital Products' }}
-    />
-    <MoreStack.Screen
-      name="PartnerOrganizations"
-      component={PartnerOrganizationsScreen}
-      options={{ headerShown: true, title: 'Partner Organizations' }}
-    />
-    <MoreStack.Screen
-      name="Locations"
-      component={LocationsScreen}
-      options={{ headerShown: true, title: 'Locations' }}
-    />
-  </MoreStack.Navigator>
-);
-
-// Exchange Stack Navigator
-const ExchangeStack = createStackNavigator();
-
-const ExchangeStackNavigator = () => (
-  <ExchangeStack.Navigator>
-    <ExchangeStack.Screen 
-      name="ExchangeHome" 
-      component={ExchangeScreen} 
-      options={{ headerShown: false }}
-    />
-    <ExchangeStack.Screen 
+    <MarketplaceStack.Screen 
       name="ExchangeDetail" 
       component={ExchangeDetailScreen} 
       options={{ 
         headerShown: false,
       }}
     />
-    <ExchangeStack.Screen 
+    <MarketplaceStack.Screen 
       name="NeededItemDetail" 
       component={NeededItemDetailScreen} 
       options={{ 
         headerShown: false,
       }}
     />
-    <ExchangeStack.Screen 
+    <MarketplaceStack.Screen 
       name="PostNeededItem" 
       component={PostNeededItemScreen} 
       options={{ 
         headerShown: false,
       }}
     />
-  </ExchangeStack.Navigator>
+    <MarketplaceStack.Screen 
+      name="CreateListing" 
+      component={PostNeededItemScreen} // Reuse this screen for now, can be replaced with a dedicated one later
+      options={{ 
+        headerShown: false,
+      }}
+    />
+  </MarketplaceStack.Navigator>
+);
+
+// Library Stack Navigator
+const LibraryStackNavigator = () => (
+  <LibraryStack.Navigator>
+    <LibraryStack.Screen 
+      name="LibraryHome" 
+      component={LibraryScreen} 
+      options={{ headerShown: false }}
+    />
+    {/* Add more screens for Bible reader, book reader, etc. here */}
+  </LibraryStack.Navigator>
 );
 
 export default function App() {
@@ -328,18 +286,16 @@ export default function App() {
 
                 if (route.name === 'Home') {
                   iconName = focused ? 'home' : 'home-outline';
-                } else if (route.name === 'Posts') {
-                  iconName = focused ? 'newspaper' : 'newspaper-outline';
-                } else if (route.name === 'Jobs') {
-                  iconName = focused ? 'briefcase' : 'briefcase-outline';
-                } else if (route.name === 'Events') {
-                  iconName = focused ? 'calendar' : 'calendar-outline';
-                } else if (route.name === 'Organizations') {
-                  iconName = focused ? 'business' : 'business-outline';
-                } else if (route.name === 'More') {
-                  iconName = focused ? 'menu' : 'menu-outline';
-                } else if (route.name === 'Exchange') {
-                  iconName = focused ? 'swap-horizontal' : 'swap-horizontal-outline';
+                } else if (route.name === 'Community') {
+                  iconName = focused ? 'people' : 'people-outline';
+                } else if (route.name === 'Marketplace') {
+                  iconName = focused ? 'storefront' : 'storefront-outline';
+                } else if (route.name === 'Library') {
+                  return <MaterialCommunityIcons 
+                            name={focused ? 'bookshelf' : 'bookshelf'} 
+                            size={size} 
+                            color={color} 
+                         />;
                 }
 
                 return <Ionicons name={iconName} size={size} color={color} />;
@@ -347,12 +303,9 @@ export default function App() {
             })}
           >
             <Tab.Screen name="Home" component={HomeStackNavigator} />
-            <Tab.Screen name="Posts" component={PostsStackNavigator} />
-            <Tab.Screen name="Jobs" component={JobsStackNavigator} />
-            <Tab.Screen name="Events" component={EventsStackNavigator} />
-            <Tab.Screen name="Organizations" component={OrganizationsStackNavigator} />
-            <Tab.Screen name="Exchange" component={ExchangeStackNavigator} />
-            <Tab.Screen name="More" component={MoreStackNavigator} />
+            <Tab.Screen name="Community" component={CommunityStackNavigator} />
+            <Tab.Screen name="Marketplace" component={MarketplaceStackNavigator} />
+            <Tab.Screen name="Library" component={LibraryStackNavigator} />
           </Tab.Navigator>
           <StatusBar style="auto" />
         </NavigationContainer>

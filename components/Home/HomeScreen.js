@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, ImageBackground, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ImageBackground, Dimensions, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import SafeLayout from '../ui/SafeLayout';
 import MomentStories from '../Moments/MomentStories';
+import PostCard from '../Posts/PostCard';
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN = 8;
@@ -258,7 +259,8 @@ const ExchangeCard = ({ item, onPress }) => {
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [hasNotifications, setHasNotifications] = useState(true);
-
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  
   // Sample data
   const events = [
     {
@@ -372,242 +374,255 @@ const HomeScreen = () => {
     }
   ];
 
+  // Add the dummy posts from PostsScreen
+  const DUMMY_POSTS = [
+    {
+      id: '1',
+      author: {
+        name: 'Sarah Johnson',
+        title: 'Youth Pastor at Hope Community Church',
+        avatar: 'https://randomuser.me/api/portraits/women/32.jpg',
+      },
+      content: '"For I know the plans I have for you," declares the LORD, "plans to prosper you and not to harm you, plans to give you hope and a future." - Jeremiah 29:11\n\nThis verse has been guiding me through some challenging times this week. What scripture speaks to you during difficult moments?',
+      media: [],
+      timestamp: '3h ago',
+      likes: 56,
+      comments: 12,
+      shares: 5,
+    },
+    {
+      id: '2',
+      author: {
+        name: 'David Wilson',
+        title: 'Worship Leader',
+        avatar: 'https://randomuser.me/api/portraits/men/45.jpg',
+      },
+      content: 'Our worship team is looking for a keyboard player to join us for Sunday services. If you have experience and a heart for worship, please reach out! We rehearse on Thursday evenings.',
+      media: [
+        {
+          uri: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8d29yc2hpcCUyMHRlYW18ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60',
+          type: 'image',
+          aspectRatio: 16/9
+        }
+      ],
+      timestamp: '5h ago',
+      likes: 28,
+      comments: 8,
+      shares: 3,
+    }
+  ];
+
   return (
     <SafeLayout backgroundColor="#f9fafb" edges={['top', 'bottom']}>
-      <View className="p-4">
-        {/* Header with Avatar and Notification Bell */}
-        <View className="flex-row items-center justify-between mb-4">
-          <View>
-            <Text className="text-2xl font-bold">Welcome to Christian360</Text>
-            <Text className="text-gray-600">Your Christian community hub</Text>
+      <View className="flex-1 bg-gray-50">
+        {/* Header with logo and user profile */}
+        <View className="bg-white px-4 py-3 flex-row justify-between items-center border-b border-gray-200">
+          <View className="flex-row items-center">
+            <Image 
+              source={require('../../assets/logo.png')} // Placeholder
+              style={{ width: 120, height: 30 }}
+              // Replace with actual logo
+              className="mr-2"
+              resizeMode="contain"
+            />
           </View>
           <View className="flex-row items-center">
-            {/* Notification Bell */}
             <TouchableOpacity 
-              className="mr-3 p-2" 
-              onPress={() => navigation.navigate('More')}
+              onPress={() => navigation.navigate('Notifications')}
+              className="mr-4 relative"
             >
-              <Ionicons name="notifications-outline" size={24} color="#4b5563" />
-              {hasNotifications && (
-                <View className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />
-              )}
+              <Ionicons name="notifications-outline" size={24} color="#4f46e5" />
+              <View className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500" />
             </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => setShowUserMenu(!showUserMenu)}
+              className="relative"
+            >
+              <Image 
+                source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+                className="w-8 h-8 rounded-full"
+              />
+              <View className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 border border-white" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Main content */}
+        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+          <View className="p-4">
+            {/* Moments */}
+            <MomentStories />
             
-            {/* User Avatar */}
-            <TouchableOpacity 
-              className="relative" 
-              onPress={() => navigation.navigate('More', { screen: 'Settings' })}
-            >
-              <Image 
-                source={{ uri: 'https://randomuser.me/api/portraits/women/43.jpg' }} 
-                className="w-10 h-10 rounded-full border-2 border-indigo-100" 
+            {/* Quick access cards */}
+            <View className="flex-row flex-wrap justify-between mt-2 mb-6">
+              <QuickAccessCard 
+                title="Daily Verse" 
+                icon={<Ionicons name="book-outline" size={18} color="#fff" />}
+                color="#6366f1"
+                onPress={() => navigation.navigate('MomentViewer', { momentId: 'daily' })}
               />
-              {hasNotifications && (
-                <View className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white" />
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Moments Stories */}
-        <MomentStories />
-
-        {/* Posts Section - Full Width */}
-        <SectionCard 
-          title="Latest Posts" 
-          icon={<Ionicons name="newspaper-outline" size={18} color="#fff" />}
-          color="#6366f1"
-          onPress={() => navigation.navigate('Posts')}
-        >
-          <View className="bg-white rounded-lg shadow-sm p-4">
-            <View className="flex-row mb-3">
-              <Image 
-                source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} 
-                className="w-10 h-10 rounded-full mr-3" 
+              <QuickAccessCard 
+                title="Prayer Requests" 
+                icon={<Ionicons name="heart-outline" size={18} color="#fff" />}
+                color="#ec4899"
+                onPress={() => {/* Navigate to prayer requests */}}
               />
-              <View>
-                <Text className="font-bold">John Smith</Text>
-                <Text className="text-gray-500 text-xs">3 hours ago</Text>
-              </View>
+              <QuickAccessCard 
+                title="My Groups" 
+                icon={<Ionicons name="people-outline" size={18} color="#fff" />}
+                color="#8b5cf6"
+                onPress={() => navigation.navigate('Groups')}
+              />
+              <QuickAccessCard 
+                title="Nearby Events" 
+                icon={<Ionicons name="calendar-outline" size={18} color="#fff" />}
+                color="#f97316"
+                onPress={() => navigation.navigate('Events')}
+              />
             </View>
-            <Text className="mb-4">Just attended an amazing worship service at Grace Community Church...</Text>
-            <TouchableOpacity 
-              className="bg-indigo-50 py-2 rounded-lg items-center" 
-              onPress={() => navigation.navigate('Posts')}
-            >
-              <Text className="text-indigo-600 font-semibold">View More Posts</Text>
-            </TouchableOpacity>
-          </View>
-        </SectionCard>
-
-        {/* Organizations Section - Full Width */}
-        <SectionCard 
-          title="Christian Organizations" 
-          icon={<Ionicons name="business-outline" size={18} color="#fff" />}
-          color="#8b5cf6"
-          onPress={() => navigation.navigate('Organizations')}
-        >
-          <View className="mb-3">
-            <Text className="text-gray-600">Connect with Christian charities and ministries doing incredible work around the world</Text>
-          </View>
-          <OrganizationCard 
-            key={organizations[0].id}
-            organization={organizations[0]} 
-            onPress={() => navigation.navigate('Organizations')}
-          />
-          <TouchableOpacity 
-            className="bg-indigo-50 py-2 rounded-lg items-center mt-2" 
-            onPress={() => navigation.navigate('Organizations')}
-          >
-            <Text className="text-indigo-600 font-semibold">Explore All Organizations</Text>
-          </TouchableOpacity>
-        </SectionCard>
-
-        {/* Events Section - Full Width with Card */}
-        <SectionCard 
-          title="Upcoming Events" 
-          icon={<Ionicons name="calendar-outline" size={18} color="#fff" />}
-          color="#ec4899"
-          onPress={() => navigation.navigate('Events')}
-        >
-          <EventCard 
-            event={events[0]} 
-            onPress={() => navigation.navigate('Events')}
-          />
-        </SectionCard>
-
-        {/* Jobs Section - Full Width with Card */}
-        <SectionCard 
-          title="Featured Jobs" 
-          icon={<Ionicons name="briefcase-outline" size={18} color="#fff" />}
-          color="#3b82f6"
-          onPress={() => navigation.navigate('Jobs')}
-        >
-          <JobCard 
-            job={jobs[0]} 
-            onPress={() => navigation.navigate('Jobs')}
-          />
-        </SectionCard>
-
-        {/* Half-width Sections */}
-        <Text className="text-xl font-bold mb-4">Explore More</Text>
-
-        {/* Half-width Cards in a Flex Row */}
-        <View className="flex-row flex-wrap justify-between">
-          {/* Events - Half Width */}
-          <View style={{ width: HALF_CARD_WIDTH }}>
-            <View className="flex-row items-center mb-2">
-              <View className="w-6 h-6 rounded-full items-center justify-center mr-1" style={{ backgroundColor: '#ec4899' }}>
-                <Ionicons name="calendar-outline" size={12} color="#fff" />
-              </View>
-              <Text className="text-sm font-bold">More Events</Text>
-            </View>
-            <EventCard 
-              event={events[1]} 
-              isHalfWidth 
-              onPress={() => navigation.navigate('Events')}
-            />
-          </View>
-
-          {/* Jobs - Half Width */}
-          <View style={{ width: HALF_CARD_WIDTH }}>
-            <View className="flex-row items-center mb-2">
-              <View className="w-6 h-6 rounded-full items-center justify-center mr-1" style={{ backgroundColor: '#3b82f6' }}>
-                <Ionicons name="briefcase-outline" size={12} color="#fff" />
-              </View>
-              <Text className="text-sm font-bold">More Jobs</Text>
-            </View>
-            <JobCard 
-              job={jobs[1]} 
-              isHalfWidth 
-              onPress={() => navigation.navigate('Jobs')}
-            />
-          </View>
-
-          {/* Organizations - Half Width */}
-          <View style={{ width: HALF_CARD_WIDTH }}>
-            <View className="flex-row items-center mb-2">
-              <View className="w-6 h-6 rounded-full items-center justify-center mr-1" style={{ backgroundColor: '#8b5cf6' }}>
-                <Ionicons name="business-outline" size={12} color="#fff" />
-              </View>
-              <Text className="text-sm font-bold">Organizations</Text>
-            </View>
-            <OrganizationCard 
-              organization={organizations[1]} 
-              isHalfWidth 
+            
+            {/* Organizations */}
+            <SectionCard
+              title="Organizations"
+              icon={<Ionicons name="business-outline" size={18} color="#fff" />}
+              color="#3b82f6"
               onPress={() => navigation.navigate('Organizations')}
-            />
-          </View>
-
-          {/* Accommodation - Half Width */}
-          <View style={{ width: HALF_CARD_WIDTH }}>
-            <View className="flex-row items-center mb-2">
-              <View className="w-6 h-6 rounded-full items-center justify-center mr-1" style={{ backgroundColor: '#10b981' }}>
-                <Ionicons name="home-outline" size={12} color="#fff" />
+            >
+              <View className="flex-row flex-wrap justify-between">
+                {organizations.slice(0, 2).map((org, index) => (
+                  <OrganizationCard 
+                    key={org.id} 
+                    organization={org} 
+                    isHalfWidth={true}
+                    onPress={() => navigation.navigate('OrganizationDetail', { organization: org })}
+                  />
+                ))}
               </View>
-              <Text className="text-sm font-bold">Accommodations</Text>
-            </View>
-            <AccommodationCard 
-              accommodation={accommodations[1]} 
-              isHalfWidth 
-              onPress={() => navigation.navigate('Stays')}
-            />
+            </SectionCard>
+            
+            {/* Events */}
+            <SectionCard
+              title="Upcoming Events"
+              icon={<Ionicons name="calendar-outline" size={18} color="#fff" />}
+              color="#10b981"
+              onPress={() => navigation.navigate('Events')}
+            >
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                className="space-x-4"
+              >
+                {events.map((event) => (
+                  <EventCard 
+                    key={event.id} 
+                    event={event} 
+                    isHalfWidth={false} 
+                    onPress={() => navigation.navigate('EventDetails', { eventId: event.id })}
+                  />
+                ))}
+              </ScrollView>
+            </SectionCard>
+            
+            {/* Jobs */}
+            <SectionCard
+              title="Recent Jobs"
+              icon={<Ionicons name="briefcase-outline" size={18} color="#fff" />}
+              color="#f59e0b"
+              onPress={() => navigation.navigate('Jobs')}
+            >
+              <View className="flex-row flex-wrap justify-between">
+                {jobs.slice(0, 2).map((job) => (
+                  <JobCard 
+                    key={job.id} 
+                    job={job} 
+                    isHalfWidth={true}
+                    onPress={() => navigation.navigate('JobDetails', { jobId: job.id })}
+                  />
+                ))}
+              </View>
+            </SectionCard>
+            
+            {/* Community Exchange */}
+            <SectionCard
+              title="Community Exchange"
+              icon={<Ionicons name="swap-horizontal-outline" size={18} color="#fff" />}
+              color="#8b5cf6"
+              onPress={() => navigation.navigate('Marketplace')}
+            >
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                className="space-x-4"
+              >
+                {exchangeItems.map((item) => (
+                  <ExchangeCard 
+                    key={item.id} 
+                    item={item} 
+                    onPress={() => navigation.navigate('ExchangeDetail', { listingId: item.id })}
+                  />
+                ))}
+              </ScrollView>
+            </SectionCard>
+            
+            {/* Partner Organizations */}
+            <SectionCard
+              title="Partner Organizations"
+              icon={<Ionicons name="people-circle-outline" size={18} color="#fff" />}
+              color="#ec4899"
+              onPress={() => navigation.navigate('PartnerOrganizations')}
+            >
+              <View className="flex-row flex-wrap justify-between">
+                {partnerOrganizations.map((org) => (
+                  <PartnerOrganizationCard 
+                    key={org.id} 
+                    organization={org}
+                    onPress={() => {/* Navigate to partner detail */}}
+                  />
+                ))}
+              </View>
+            </SectionCard>
+            
+            {/* Christian360 Feed */}
+            <SectionCard
+              title="Christian360 Feed"
+              icon={<Ionicons name="newspaper-outline" size={18} color="#fff" />}
+              color="#4f46e5"
+              onPress={() => {/* Navigate to full feed */}}
+            >
+              <View className="mb-2">
+                {/* Create Post Button */}
+                <TouchableOpacity 
+                  className="flex-row p-3 bg-white rounded-lg shadow-sm items-center mb-4"
+                  activeOpacity={0.7}
+                  onPress={() => navigation.navigate('CreatePost')}
+                >
+                  <Image 
+                    source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+                    className="w-10 h-10 rounded-full mr-3"
+                  />
+                  <View className="flex-1 bg-gray-100 rounded-full py-2 px-4">
+                    <Text className="text-gray-500">Share your thoughts or scripture...</Text>
+                  </View>
+                </TouchableOpacity>
+                
+                {/* Posts */}
+                {DUMMY_POSTS.map((post) => (
+                  <View key={post.id} className="mb-4">
+                    <PostCard {...post} navigation={navigation} />
+                  </View>
+                ))}
+                
+                {/* View More Button */}
+                <TouchableOpacity 
+                  className="bg-indigo-50 py-3 rounded-lg items-center"
+                  onPress={() => navigation.navigate('Posts')}
+                >
+                  <Text className="text-indigo-700 font-semibold">View More Posts</Text>
+                </TouchableOpacity>
+              </View>
+            </SectionCard>
           </View>
-        </View>
-
-        {/* Community Exchange Section */}
-        <SectionCard 
-          title="Community Exchange" 
-          icon={<Ionicons name="swap-horizontal-outline" size={18} color="#fff" />}
-          color="#4f46e5"
-          onPress={() => navigation.navigate('Exchange')}
-        >
-          <View className="mb-2">
-            <Text className="text-gray-600">Borrow equipment, venues, and services from trusted members</Text>
-          </View>
-          {exchangeItems.map(item => (
-            <ExchangeCard 
-              key={item.id}
-              item={item} 
-              onPress={() => navigation.navigate('Exchange')}
-            />
-          ))}
-          <TouchableOpacity 
-            className="bg-indigo-50 py-2 rounded-lg items-center" 
-            onPress={() => navigation.navigate('Exchange')}
-          >
-            <Text className="text-indigo-600 font-semibold">View Community Exchange</Text>
-          </TouchableOpacity>
-        </SectionCard>
-
-        {/* Quick Access Sections */}
-        <Text className="text-xl font-bold my-4">Quick Access</Text>
-        <View className="flex-row flex-wrap justify-between">
-          <QuickAccessCard 
-            title="Groups" 
-            icon={<Ionicons name="people-outline" size={24} color="#8b5cf6" />}
-            color="#8b5cf6"
-            onPress={() => navigation.navigate('More', { screen: 'Groups' })}
-          />
-          <QuickAccessCard 
-            title="Reading" 
-            icon={<Ionicons name="book-outline" size={24} color="#f59e0b" />}
-            color="#f59e0b"
-            onPress={() => navigation.navigate('More', { screen: 'RecommendedReading' })}
-          />
-        </View>
-
-        {/* Partner Organizations Section */}
-        <Text className="text-xl font-bold mb-3">Partner Organizations</Text>
-        <View className="flex-row flex-wrap justify-between mb-4">
-          {partnerOrganizations.map(organization => (
-            <PartnerOrganizationCard
-              key={organization.id}
-              organization={organization}
-              onPress={() => navigation.navigate('More', { screen: 'PartnerOrganizations' })}
-            />
-          ))}
-        </View>
+        </ScrollView>
       </View>
     </SafeLayout>
   );
