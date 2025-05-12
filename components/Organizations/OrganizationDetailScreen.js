@@ -5,6 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SafeLayout from '../ui/SafeLayout';
 import { Audio } from 'expo-av';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 // Get screen width for FlatList items
 const { width: screenWidth } = Dimensions.get('window');
@@ -109,6 +110,227 @@ const momentsByOrganization = {
       ],
     }
   ],
+};
+
+// Sample Locations Data
+const organizationLocations = {
+  '1': { // Compassion International
+    headquarters: {
+      name: 'Global Headquarters',
+      address: 'Colorado Springs, CO, USA',
+      coordinates: { latitude: 38.8339, longitude: -104.8214 }
+    },
+    mainLocations: [
+      { name: 'East Africa Office', address: 'Nairobi, Kenya', coordinates: { latitude: -1.2921, longitude: 36.8219 } },
+      { name: 'Asia Region Office', address: 'Manila, Philippines', coordinates: { latitude: 14.5995, longitude: 120.9842 } },
+      { name: 'Latin America Office', address: 'Quito, Ecuador', coordinates: { latitude: -0.1807, longitude: -78.4678 } }
+    ],
+    partnerChurches: [
+      { name: 'Faith Community Church', address: 'Lusaka, Zambia', coordinates: { latitude: -15.3875, longitude: 28.3228 } },
+      { name: 'Hope Ministries', address: 'San Salvador, El Salvador', coordinates: { latitude: 13.6929, longitude: -89.2182 } },
+      { name: 'Grace Baptist Church', address: 'Port-au-Prince, Haiti', coordinates: { latitude: 18.5944, longitude: -72.3074 } }
+    ],
+    otherLocations: [
+      { name: 'Child Development Centre', address: 'Addis Ababa, Ethiopia', coordinates: { latitude: 9.0222, longitude: 38.7468 } },
+      { name: 'Community Centre', address: 'Dhaka, Bangladesh', coordinates: { latitude: 23.8103, longitude: 90.4125 } }
+    ]
+  },
+  '2': { // Elevation Church
+    headquarters: {
+      name: 'Elevation Church Main Campus',
+      address: 'Charlotte, NC, USA',
+      coordinates: { latitude: 35.2271, longitude: -80.8431 }
+    },
+    mainLocations: [
+      { name: 'Ballantyne Campus', address: 'Charlotte, NC, USA', coordinates: { latitude: 35.0485, longitude: -80.8456 } },
+      { name: 'Lake Norman Campus', address: 'Cornelius, NC, USA', coordinates: { latitude: 35.4765, longitude: -80.8898 } },
+      { name: 'University City Campus', address: 'Charlotte, NC, USA', coordinates: { latitude: 35.3045, longitude: -80.7457 } }
+    ],
+    partnerChurches: [
+      { name: 'Mosaic Church', address: 'Los Angeles, CA, USA', coordinates: { latitude: 34.0522, longitude: -118.2437 } },
+      { name: 'NewSpring Church', address: 'Anderson, SC, USA', coordinates: { latitude: 34.5034, longitude: -82.6501 } }
+    ],
+    otherLocations: [
+      { name: 'Elevation Outreach Centre', address: 'Charlotte, NC, USA', coordinates: { latitude: 35.1995, longitude: -80.8130 } }
+    ]
+  },
+  '3': { // Chick-fil-A
+    headquarters: {
+      name: 'Chick-fil-A Headquarters',
+      address: 'College Park, GA, USA',
+      coordinates: { latitude: 33.6518, longitude: -84.4488 }
+    },
+    mainLocations: [
+      { name: 'Truett's original restaurant', address: 'Hapeville, GA, USA', coordinates: { latitude: 33.6614, longitude: -84.4000 } },
+      { name: 'Innovation Center', address: 'Atlanta, GA, USA', coordinates: { latitude: 33.7490, longitude: -84.3880 } }
+    ],
+    partnerChurches: [],
+    otherLocations: [
+      { name: 'Chick-fil-A Leadership Academy', address: 'Atlanta, GA, USA', coordinates: { latitude: 33.7545, longitude: -84.3900 } }
+    ]
+  }
+};
+
+// Sample Recommended Resources Data
+const organizationResources = {
+  '1': [ // Compassion International
+    {
+      id: '101',
+      type: 'book',
+      title: 'Compassion: A Call to Take Action',
+      author: 'Wess Stafford',
+      coverImage: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=300&q=80',
+      description: 'A powerful look at how child sponsorship can change lives and communities around the world.',
+      link: 'https://www.compassion.com/resources/books'
+    },
+    {
+      id: '102',
+      type: 'video',
+      title: 'The Journey of Sponsorship',
+      author: 'Compassion International',
+      coverImage: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=300&q=80',
+      description: 'Follow the journey of a sponsored child and see the impact of sponsorship over time.',
+      link: 'https://www.compassion.com/resources/videos'
+    },
+    {
+      id: '103',
+      type: 'course',
+      title: 'Poverty Alleviation Fundamentals',
+      author: 'Compassion Training Team',
+      coverImage: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=300&q=80',
+      description: 'Learn the fundamental principles of effective poverty alleviation and community development.',
+      link: 'https://www.compassion.com/resources/courses'
+    }
+  ],
+  '2': [ // Elevation Church
+    {
+      id: '201',
+      type: 'book',
+      title: 'Crash the Chatterbox',
+      author: 'Steven Furtick',
+      coverImage: 'https://images.unsplash.com/photo-1589998059171-988d887df646?auto=format&fit=crop&w=300&q=80',
+      description: 'Learn to recognize and silence the lies of the enemy and hear God\'s voice above all others.',
+      link: 'https://elevationchurch.org/resources/books'
+    },
+    {
+      id: '202',
+      type: 'course',
+      title: 'Growth Track',
+      author: 'Elevation Church',
+      coverImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=300&q=80',
+      description: 'Discover your purpose and learn how to make a difference with your life through serving others.',
+      link: 'https://elevationchurch.org/resources/courses'
+    },
+    {
+      id: '203',
+      type: 'music',
+      title: 'Elevation Worship Collection',
+      author: 'Elevation Worship',
+      coverImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80',
+      description: 'Music from Elevation Worship to inspire your daily devotional time and personal worship.',
+      link: 'https://elevationchurch.org/resources/music'
+    }
+  ],
+  '3': [ // Chick-fil-A
+    {
+      id: '301',
+      type: 'book',
+      title: 'It\'s Better to Build Boys Than Mend Men',
+      author: 'S. Truett Cathy',
+      coverImage: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=300&q=80',
+      description: 'The Chick-fil-A founder shares principles on mentoring and youth development.',
+      link: 'https://www.chick-fil-a.com/resources'
+    },
+    {
+      id: '302',
+      type: 'course',
+      title: 'Business Leadership Principles',
+      author: 'Chick-fil-A Leadership Development',
+      coverImage: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80',
+      description: 'Learn the business and leadership principles that have made Chick-fil-A successful.',
+      link: 'https://www.chick-fil-a.com/resources/leadership'
+    }
+  ]
+};
+
+// Sample Partner Organizations Data
+const organizationPartners = {
+  '1': [ // Compassion International
+    {
+      id: 'p101',
+      name: 'World Vision',
+      logo: 'https://i.imgur.com/Qrm8Kgb.png',
+      banner: 'https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=300&q=80',
+      description: 'Partner in global humanitarian efforts to support children and communities.'
+    },
+    {
+      id: 'p102',
+      name: 'International Justice Mission',
+      logo: 'https://i.imgur.com/7jRNF2G.png',
+      banner: 'https://images.unsplash.com/photo-1455849318743-b2233052fcff?auto=format&fit=crop&w=300&q=80',
+      description: 'Collaborating to protect children from trafficking and abuse in vulnerable areas.'
+    },
+    {
+      id: 'p103',
+      name: 'Food for the Hungry',
+      logo: 'https://i.imgur.com/Jt8wNJr.png',
+      banner: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=300&q=80',
+      description: 'Working together to address food security in communities with sponsored children.'
+    },
+    {
+      id: 'p104',
+      name: 'Tearfund',
+      logo: 'https://i.imgur.com/Q7yLT5W.png',
+      banner: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=300&q=80',
+      description: 'Partnering on disaster response and community development initiatives.'
+    }
+  ],
+  '2': [ // Elevation Church
+    {
+      id: 'p201',
+      name: 'Orange (ReThink Group)',
+      logo: 'https://i.imgur.com/XQhYKLh.png',
+      banner: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=300&q=80',
+      description: 'Curriculum partner for children and youth ministry resources.'
+    },
+    {
+      id: 'p202',
+      name: 'VOUS Church',
+      logo: 'https://i.imgur.com/gQJdKMT.png',
+      banner: 'https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?auto=format&fit=crop&w=300&q=80',
+      description: 'Partner church for conferences and leadership development.'
+    },
+    {
+      id: 'p203',
+      name: 'Proverbs 31 Ministries',
+      logo: 'https://i.imgur.com/4Fz9mME.png',
+      banner: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=300&q=80',
+      description: 'Collaboration on women\'s ministry resources and events.'
+    }
+  ],
+  '3': [ // Chick-fil-A
+    {
+      id: 'p301',
+      name: 'Junior Achievement',
+      logo: 'https://i.imgur.com/bZFI8r1.png',
+      banner: 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=300&q=80',
+      description: 'Partnership to provide business education to young people.'
+    },
+    {
+      id: 'p302',
+      name: 'WinShape Foundation',
+      logo: 'https://i.imgur.com/sDiIQaV.png',
+      banner: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&w=300&q=80',
+      description: 'Affiliated foundation focusing on foster care, camps, and marriage programs.'
+    },
+    {
+      id: 'p303',
+      name: 'Habitat for Humanity',
+      logo: 'https://i.imgur.com/EtgJGqg.png',
+      banner: 'https://images.unsplash.com/photo-1582653291997-079b4f452354?auto=format&fit=crop&w=300&q=80',
+      description: 'Community service partner for building homes and strengthening communities.'
+    }
+  ]
 };
 
 // New Component: MomentContentItem (Updated for Audio)
@@ -302,6 +524,388 @@ const DailyMomentViewer = ({ organizationId }) => {
   );
 };
 
+// Component for displaying location maps
+const LocationsSection = ({ organizationId }) => {
+  const [activeMapType, setActiveMapType] = useState('headquarters');
+  const locations = organizationLocations[organizationId];
+  
+  if (!locations) {
+    return (
+      <View className="my-6 px-4">
+        <Text className="text-lg font-bold mb-2">Locations</Text>
+        <Text className="text-gray-600">No location information available.</Text>
+      </View>
+    );
+  }
+  
+  // Determine which locations to show based on active type
+  const getLocationsToShow = () => {
+    switch (activeMapType) {
+      case 'headquarters':
+        return locations.headquarters ? [locations.headquarters] : [];
+      case 'main':
+        return locations.mainLocations || [];
+      case 'partners':
+        return locations.partnerChurches || [];
+      case 'others':
+        return locations.otherLocations || [];
+      default:
+        return [];
+    }
+  };
+  
+  const locationsToShow = getLocationsToShow();
+  
+  // Calculate the region to show all markers
+  const getMapRegion = () => {
+    if (locationsToShow.length === 0) {
+      // Default region if no locations
+      return {
+        latitude: 0,
+        longitude: 0,
+        latitudeDelta: 90,
+        longitudeDelta: 90
+      };
+    }
+    
+    if (locationsToShow.length === 1) {
+      // If only one location, center on it with a reasonable zoom
+      const location = locationsToShow[0];
+      return {
+        latitude: location.coordinates.latitude,
+        longitude: location.coordinates.longitude,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1
+      };
+    }
+    
+    // Find min/max lat/long to encompass all markers
+    let minLat = Number.MAX_VALUE;
+    let maxLat = Number.MIN_VALUE;
+    let minLng = Number.MAX_VALUE;
+    let maxLng = Number.MIN_VALUE;
+    
+    locationsToShow.forEach(location => {
+      const { latitude, longitude } = location.coordinates;
+      minLat = Math.min(minLat, latitude);
+      maxLat = Math.max(maxLat, latitude);
+      minLng = Math.min(minLng, longitude);
+      maxLng = Math.max(maxLng, longitude);
+    });
+    
+    const centerLat = (minLat + maxLat) / 2;
+    const centerLng = (minLng + maxLng) / 2;
+    
+    // Add some padding
+    const latDelta = (maxLat - minLat) * 1.5 || 0.1;
+    const lngDelta = (maxLng - minLng) * 1.5 || 0.1;
+    
+    return {
+      latitude: centerLat,
+      longitude: centerLng,
+      latitudeDelta: Math.max(latDelta, 0.1),
+      longitudeDelta: Math.max(lngDelta, 0.1)
+    };
+  };
+  
+  return (
+    <View className="my-6 px-4">
+      <Text className="text-lg font-bold mb-2">Locations</Text>
+      
+      {/* Tab selector for different location types */}
+      <View className="flex-row mb-3 bg-gray-100 rounded-lg p-1">
+        <TouchableOpacity 
+          className={`flex-1 py-2 rounded-md flex items-center ${
+            activeMapType === 'headquarters' ? 'bg-white shadow' : ''
+          }`}
+          onPress={() => setActiveMapType('headquarters')}
+        >
+          <Text className={activeMapType === 'headquarters' ? 'text-indigo-600 font-medium' : 'text-gray-600'}>
+            HQ
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          className={`flex-1 py-2 rounded-md flex items-center ${
+            activeMapType === 'main' ? 'bg-white shadow' : ''
+          }`}
+          onPress={() => setActiveMapType('main')}
+        >
+          <Text className={activeMapType === 'main' ? 'text-indigo-600 font-medium' : 'text-gray-600'}>
+            Main
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          className={`flex-1 py-2 rounded-md flex items-center ${
+            activeMapType === 'partners' ? 'bg-white shadow' : ''
+          }`}
+          onPress={() => setActiveMapType('partners')}
+        >
+          <Text className={activeMapType === 'partners' ? 'text-indigo-600 font-medium' : 'text-gray-600'}>
+            Partners
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          className={`flex-1 py-2 rounded-md flex items-center ${
+            activeMapType === 'others' ? 'bg-white shadow' : ''
+          }`}
+          onPress={() => setActiveMapType('others')}
+        >
+          <Text className={activeMapType === 'others' ? 'text-indigo-600 font-medium' : 'text-gray-600'}>
+            Other
+          </Text>
+        </TouchableOpacity>
+      </View>
+      
+      {/* Map */}
+      <View className="rounded-lg overflow-hidden h-52 shadow mb-2">
+        {locationsToShow.length > 0 ? (
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={{ width: '100%', height: '100%' }}
+            region={getMapRegion()}
+            scrollEnabled={true}
+            zoomEnabled={true}
+          >
+            {locationsToShow.map((location, index) => (
+              <Marker
+                key={index}
+                coordinate={{
+                  latitude: location.coordinates.latitude,
+                  longitude: location.coordinates.longitude
+                }}
+                title={location.name}
+                description={location.address}
+                pinColor={activeMapType === 'headquarters' ? '#4f46e5' : 
+                         activeMapType === 'main' ? '#10b981' :
+                         activeMapType === 'partners' ? '#f59e0b' : '#6366f1'}
+              />
+            ))}
+          </MapView>
+        ) : (
+          <View className="flex-1 items-center justify-center bg-gray-100">
+            <Text className="text-gray-500">No locations available</Text>
+          </View>
+        )}
+      </View>
+      
+      {/* Location list */}
+      <View className="mt-2">
+        {locationsToShow.length > 0 ? (
+          locationsToShow.map((location, index) => (
+            <View key={index} className="flex-row items-start mb-2 py-2 border-b border-gray-100">
+              <Ionicons name="location" size={18} color="#6366f1" style={{ marginTop: 2 }} />
+              <View className="ml-2 flex-1">
+                <Text className="font-semibold">{location.name}</Text>
+                <Text className="text-gray-600 text-sm">{location.address}</Text>
+              </View>
+              <TouchableOpacity 
+                className="bg-gray-100 p-2 rounded-full"
+                onPress={() => {
+                  const url = `https://www.google.com/maps/search/?api=1&query=${location.coordinates.latitude},${location.coordinates.longitude}`;
+                  Linking.openURL(url);
+                }}
+              >
+                <Ionicons name="navigate-outline" size={16} color="#6b7280" />
+              </TouchableOpacity>
+            </View>
+          ))
+        ) : (
+          <Text className="text-gray-600 italic text-center py-2">
+            No {activeMapType === 'headquarters' ? 'headquarters' : 
+                activeMapType === 'main' ? 'main locations' :
+                activeMapType === 'partners' ? 'partner churches' : 'other locations'} available
+          </Text>
+        )}
+      </View>
+    </View>
+  );
+};
+
+// Component for recommended resources
+const RecommendedResourcesSection = ({ organizationId }) => {
+  const resources = organizationResources[organizationId] || [];
+  
+  if (resources.length === 0) {
+    return (
+      <View className="my-6 px-4">
+        <Text className="text-lg font-bold mb-2">Recommended Resources</Text>
+        <Text className="text-gray-600">No recommended resources available.</Text>
+      </View>
+    );
+  }
+  
+  // Get icon based on resource type
+  const getResourceIcon = (type) => {
+    switch (type) {
+      case 'book':
+        return 'book-outline';
+      case 'video':
+        return 'videocam-outline';
+      case 'course':
+        return 'school-outline';
+      case 'music':
+        return 'musical-notes-outline';
+      default:
+        return 'document-text-outline';
+    }
+  };
+  
+  // Get background color based on resource type
+  const getResourceBgColor = (type) => {
+    switch (type) {
+      case 'book':
+        return 'bg-blue-50';
+      case 'video':
+        return 'bg-rose-50';
+      case 'course':
+        return 'bg-amber-50';
+      case 'music':
+        return 'bg-purple-50';
+      default:
+        return 'bg-gray-50';
+    }
+  };
+  
+  // Get text color based on resource type
+  const getResourceTextColor = (type) => {
+    switch (type) {
+      case 'book':
+        return 'text-blue-800';
+      case 'video':
+        return 'text-rose-800';
+      case 'course':
+        return 'text-amber-800';
+      case 'music':
+        return 'text-purple-800';
+      default:
+        return 'text-gray-800';
+    }
+  };
+  
+  // Get icon color based on resource type
+  const getResourceIconColor = (type) => {
+    switch (type) {
+      case 'book':
+        return '#1e40af';
+      case 'video':
+        return '#be123c';
+      case 'course':
+        return '#b45309';
+      case 'music':
+        return '#6b21a8';
+      default:
+        return '#374151';
+    }
+  };
+  
+  const handleResourcePress = (resource) => {
+    Linking.openURL(resource.link);
+  };
+  
+  return (
+    <View className="my-6 px-4">
+      <Text className="text-lg font-bold mb-4">Recommended Resources</Text>
+      
+      {resources.map((resource, index) => (
+        <TouchableOpacity
+          key={resource.id}
+          className="flex-row items-center mb-4 bg-white rounded-lg shadow-sm overflow-hidden"
+          onPress={() => handleResourcePress(resource)}
+          activeOpacity={0.7}
+        >
+          <Image 
+            source={{ uri: resource.coverImage }}
+            className="w-20 h-20"
+            resizeMode="cover"
+          />
+          <View className="flex-1 p-3">
+            <View className="flex-row items-center mb-1">
+              <View className={`${getResourceBgColor(resource.type)} p-1 rounded-md mr-2`}>
+                <Ionicons name={getResourceIcon(resource.type)} size={12} color={getResourceIconColor(resource.type)} />
+              </View>
+              <Text className={`text-xs font-medium ${getResourceTextColor(resource.type)}`}>
+                {resource.type.charAt(0).toUpperCase() + resource.type.slice(1)}
+              </Text>
+            </View>
+            <Text className="font-bold text-gray-800" numberOfLines={1}>{resource.title}</Text>
+            <Text className="text-gray-600 text-xs mb-1">By {resource.author}</Text>
+            <Text className="text-gray-600 text-xs" numberOfLines={2}>{resource.description}</Text>
+          </View>
+          <View className="pr-2">
+            <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+          </View>
+        </TouchableOpacity>
+      ))}
+      
+      <TouchableOpacity 
+        className="mt-2 bg-indigo-50 py-3 rounded-lg items-center"
+        onPress={() => {
+          Linking.openURL(resources[0]?.link || '#');
+        }}
+      >
+        <Text className="text-indigo-700 font-semibold">View All Resources</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+// Component for partner organizations
+const PartnersSection = ({ organizationId }) => {
+  const partners = organizationPartners[organizationId] || [];
+  
+  if (partners.length === 0) {
+    return (
+      <View className="my-6 px-4">
+        <Text className="text-lg font-bold mb-2">Partners</Text>
+        <Text className="text-gray-600">No partner organizations available.</Text>
+      </View>
+    );
+  }
+  
+  return (
+    <View className="my-6 px-4">
+      <Text className="text-lg font-bold mb-4">Partners</Text>
+      
+      <View className="flex-row flex-wrap justify-between">
+        {partners.map((partner) => (
+          <TouchableOpacity
+            key={partner.id}
+            className="bg-white rounded-lg shadow-sm overflow-hidden mb-4"
+            style={{ width: '48%' }}
+            activeOpacity={0.7}
+          >
+            <View className="relative">
+              <Image 
+                source={{ uri: partner.banner }}
+                className="w-full h-24"
+                resizeMode="cover"
+              />
+              <View className="absolute inset-0 bg-black/20" />
+              <View className="absolute top-2 left-2 bg-white rounded-full p-1">
+                <Image 
+                  source={{ uri: partner.logo }}
+                  className="w-8 h-8"
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
+            <View className="p-2">
+              <Text className="font-bold text-sm" numberOfLines={1}>{partner.name}</Text>
+              <Text className="text-gray-600 text-xs" numberOfLines={2}>{partner.description}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+      
+      <TouchableOpacity 
+        className="mt-2 bg-indigo-50 py-3 rounded-lg items-center"
+      >
+        <Text className="text-indigo-700 font-semibold">View All Partners</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 const OrganizationDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -402,6 +1006,15 @@ const OrganizationDetailScreen = () => {
         {/* Daily Moment Viewer - It handles its own internal padding and margins (mx-4 for side margins) */}
         <DailyMomentViewer organizationId={organization.id} />
         
+        {/* Locations section */}
+        <LocationsSection organizationId={organization.id} />
+        
+        {/* Recommended Resources section */}
+        <RecommendedResourcesSection organizationId={organization.id} />
+        
+        {/* Partners section */}
+        <PartnersSection organizationId={organization.id} />
+        
         {/* View Groups Button (New) */}
         <View className="my-6 px-4">
           <TouchableOpacity 
@@ -434,15 +1047,6 @@ const OrganizationDetailScreen = () => {
           </TouchableOpacity>
         </View>
         
-        {/* Location section - already had px-4 */}
-        <View className="mb-6 px-4">
-            <Text className="text-lg font-bold mb-2">Location</Text>
-            <View className="flex-row items-center">
-              <Ionicons name="location-outline" size={18} color="#6b7280" />
-              <Text className="text-gray-700 ml-2">{organization.location}</Text>
-            </View>
-          </View>
-          
         {/* Contact section - already had px-4 */}
         <View className="mb-6 px-4">
             <Text className="text-lg font-bold mb-2">Contact</Text>
